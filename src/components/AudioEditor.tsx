@@ -187,8 +187,10 @@ export const AudioEditor = ({ file }: AudioEditorProps) => {
           <div className="text-sm text-muted-foreground">
             {formatTime(currentTime)} / {formatTime(duration)}
           </div>
-          <div className="text-sm text-muted-foreground">
-            Sélection: {formatTime(region.end - region.start)}
+          <div className="flex gap-4 text-sm text-muted-foreground">
+            <span>Début: {formatTime(region.start)}</span>
+            <span>Fin: {formatTime(region.end)}</span>
+            <span>Durée: {formatTime(region.end - region.start)}</span>
           </div>
         </div>
 
