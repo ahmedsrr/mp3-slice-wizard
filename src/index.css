@@ -2,102 +2,57 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
-
+/* Toutes les couleurs sont en HSL. */
 @layer base {
   :root {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-
-    --card: 240 10% 7%;
-    --card-foreground: 0 0% 98%;
-
-    --popover: 240 10% 7%;
-    --popover-foreground: 0 0% 98%;
-
-    --primary: 263 70% 50%;
+    --background: 40 33% 98%;
+    --foreground: 160 20% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 160 20% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 160 20% 12%;
+    --primary: 158 64% 28%;
     --primary-foreground: 0 0% 100%;
-
-    --secondary: 240 5% 26%;
-    --secondary-foreground: 0 0% 98%;
-
-    --muted: 240 5% 16%;
-    --muted-foreground: 240 5% 65%;
-
-    --accent: 188 94% 55%;
-    --accent-foreground: 0 0% 100%;
-
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 240 5% 16%;
-    --input: 240 5% 16%;
-    --ring: 263 70% 50%;
-
+    --secondary: 150 20% 93%;
+    --secondary-foreground: 160 25% 18%;
+    --muted: 40 20% 94%;
+    --muted-foreground: 160 8% 40%;
+    --accent: 38 92% 50%;
+    --accent-foreground: 30 40% 12%;
+    --destructive: 0 72% 48%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 152 60% 34%;
+    --warning: 35 92% 45%;
+    --border: 40 15% 86%;
+    --input: 40 15% 82%;
+    --ring: 158 64% 28%;
     --radius: 0.75rem;
-    
-    --gradient-primary: linear-gradient(135deg, hsl(263 70% 50%), hsl(283 70% 60%));
-    --gradient-accent: linear-gradient(135deg, hsl(188 94% 55%), hsl(263 70% 50%));
-    --waveform-gradient: linear-gradient(90deg, hsl(263 70% 50%), hsl(188 94% 55%));
-    
-    --shadow-glow: 0 0 30px hsl(263 70% 50% / 0.3);
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
-  .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-
-    --card: 240 10% 7%;
-    --card-foreground: 0 0% 98%;
-
-    --popover: 240 10% 7%;
-    --popover-foreground: 0 0% 98%;
-
-    --primary: 263 70% 50%;
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 240 5% 26%;
-    --secondary-foreground: 0 0% 98%;
-
-    --muted: 240 5% 16%;
-    --muted-foreground: 240 5% 65%;
-
-    --accent: 188 94% 55%;
-    --accent-foreground: 0 0% 100%;
-
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 240 5% 16%;
-    --input: 240 5% 16%;
-    --ring: 263 70% 50%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --background: 165 20% 7%;
+      --foreground: 40 20% 94%;
+      --card: 165 18% 10%;
+      --card-foreground: 40 20% 94%;
+      --popover: 165 18% 10%;
+      --popover-foreground: 40 20% 94%;
+      --primary: 156 55% 42%;
+      --primary-foreground: 0 0% 100%;
+      --secondary: 165 15% 16%;
+      --secondary-foreground: 40 20% 94%;
+      --muted: 165 15% 14%;
+      --muted-foreground: 160 8% 65%;
+      --accent: 38 92% 55%;
+      --accent-foreground: 30 40% 10%;
+      --destructive: 0 70% 58%;
+      --destructive-foreground: 0 0% 100%;
+      --success: 150 55% 50%;
+      --warning: 38 92% 58%;
+      --border: 165 12% 20%;
+      --input: 165 12% 24%;
+      --ring: 156 55% 42%;
+    }
   }
 }
 
@@ -107,6 +62,6 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans antialiased;
   }
 }

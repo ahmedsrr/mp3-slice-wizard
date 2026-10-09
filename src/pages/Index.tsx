@@ -1,74 +1,48 @@
-import { useState } from "react";
-import { FileUpload } from "@/components/FileUpload";
-import { AudioEditor } from "@/components/AudioEditor";
-import { AdSense } from "@/components/AdSense";
-import { Scissors } from "lucide-react";
+import { NavLink, Outlet } from "react-router-dom";
+import { BookOpenCheck, Calculator, FileText, Home as HomeIcon, PenLine, Timer } from "lucide-react";
 
-const Index = () => {
-  const [audioFile, setAudioFile] = useState<File | null>(null);
+const nav = [
+  { to: "/", label: "Accueil", icon: HomeIcon, end: true },
+  { to: "/maths", label: "Maths", icon: Calculator },
+  { to: "/tsq", label: "TSQ", icon: FileText },
+  { to: "/dissertation", label: "Dissertation", icon: PenLine },
+  { to: "/examen", label: "Examen blanc", icon: Timer },
+];
 
-  return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6">
-      <div className="flex w-full max-w-7xl gap-6">
-        {/* Publicité côté gauche */}
-        <aside className="hidden lg:block w-40 flex-shrink-0">
-          <div className="sticky top-6">
-            <AdSense slot="1234567890" className="min-h-[600px]" />
-          </div>
-        </aside>
-
-        {/* Contenu principal */}
-        <div className="flex-1 max-w-4xl space-y-8">
-        <header className="text-center space-y-4">
-          <div className="flex items-center justify-center gap-3">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-primary to-accent">
-              <Scissors className="h-8 w-8 text-primary-foreground" />
-            </div>
-            <h1 className="text-5xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-              MP3 Découpeur
-            </h1>
-          </div>
-          <p className="text-xl text-muted-foreground">
-            Découpez vos fichiers audio facilement et gratuitement
-          </p>
-        </header>
-
-        <main className="flex flex-col items-center">
-          {!audioFile ? (
-            <div className="w-full">
-              <FileUpload onFileSelect={setAudioFile} />
-            </div>
-          ) : (
-            <AudioEditor file={audioFile} />
-          )}
-        </main>
-
-        {audioFile && (
-          <div className="text-center">
-            <button
-              onClick={() => setAudioFile(null)}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+const Layout = () => (
+  <div className="min-h-screen bg-background">
+    <header className="sticky top-0 z-20 border-b bg-background/90 backdrop-blur">
+      <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3">
+        <NavLink to="/" className="flex items-center gap-2 font-bold">
+          <BookOpenCheck className="h-6 w-6 text-primary" />
+          <span className="hidden sm:inline">CREM 2026</span>
+        </NavLink>
+        <nav className="flex flex-1 gap-1 overflow-x-auto">
+          {nav.map((n) => (
+            <NavLink
+              key={n.to}
+              to={n.to}
+              end={n.end}
+              className={({ isActive }) =>
+                `flex shrink-0 items-center gap-1.5 rounded-md px-3 py-2 text-sm transition-colors ${
+                  isActive ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                }`
+              }
             >
-              Charger un autre fichier
-            </button>
-          </div>
-        )}
-
-        {/* Publicité en bas */}
-        <div className="mt-8">
-          <AdSense slot="0987654321" format="horizontal" />
-        </div>
+              <n.icon className="h-4 w-4" />
+              <span className="hidden md:inline">{n.label}</span>
+            </NavLink>
+          ))}
+        </nav>
       </div>
+    </header>
+    <main className="mx-auto max-w-7xl px-4 py-8">
+      <Outlet />
+    </main>
+    <footer className="border-t py-6 text-center text-xs text-muted-foreground">
+      Outil de révision indépendant, non affilié au Ministère de l'Éducation nationale. Textes et sujets d'entraînement originaux.
+    </footer>
+  </div>
+);
 
-      {/* Publicité côté droit */}
-      <aside className="hidden lg:block w-40 flex-shrink-0">
-        <div className="sticky top-6">
-          <AdSense slot="1122334455" className="min-h-[600px]" />
-        </div>
-      </aside>
-    </div>
-    </div>
-  );
-};
-
-export default Index;
+export default Layout;
