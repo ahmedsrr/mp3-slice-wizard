@@ -9,6 +9,7 @@ import { drills, tsqTexts, type TsqText } from "@/data/tsq";
 import { errorSentences, parseErrorSentence } from "@/data/tsqExtra";
 import { useLocalText, useProgress } from "@/lib/progress";
 import { Timer } from "./Timer";
+import { AnalyseGrammaticale, AnalyseLogique, ParticipePasse } from "./Grammaire";
 
 const shuffle = <T,>(arr: T[]) => [...arr].sort(() => Math.random() - 0.5);
 
@@ -287,9 +288,12 @@ export function TsqSection() {
 
   return (
     <Tabs defaultValue="textes" className="space-y-6">
-      <TabsList className="grid h-auto w-full grid-cols-3 sm:inline-flex sm:w-auto">
+      <TabsList className="grid h-auto w-full grid-cols-3 sm:inline-flex sm:w-auto sm:flex-wrap">
         <TabsTrigger value="textes" className="whitespace-normal">Textes</TabsTrigger>
-        <TabsTrigger value="langue" className="whitespace-normal">QCM de langue</TabsTrigger>
+        <TabsTrigger value="grammaticale" className="whitespace-normal">Analyse gramm.</TabsTrigger>
+        <TabsTrigger value="logique" className="whitespace-normal">Analyse logique</TabsTrigger>
+        <TabsTrigger value="participe" className="whitespace-normal">Participe passé</TabsTrigger>
+        <TabsTrigger value="langue" className="whitespace-normal">QCM</TabsTrigger>
         <TabsTrigger value="erreurs" className="whitespace-normal">Erreurs</TabsTrigger>
       </TabsList>
 
@@ -320,6 +324,18 @@ export function TsqSection() {
 
       <TabsContent value="langue">
         <Drills />
+      </TabsContent>
+
+      <TabsContent value="grammaticale">
+        <AnalyseGrammaticale />
+      </TabsContent>
+
+      <TabsContent value="logique">
+        <AnalyseLogique />
+      </TabsContent>
+
+      <TabsContent value="participe">
+        <ParticipePasse />
       </TabsContent>
 
       <TabsContent value="erreurs">

@@ -8,7 +8,7 @@ import { CheckCircle2, Lightbulb, RefreshCw, XCircle } from "lucide-react";
 import { generateExercise, generateProblem, hm, mathTopics, type MathExercise } from "@/data/maths";
 import { fmt, isClose, parseAnswer, parseTime, useProgress } from "@/lib/progress";
 
-const expected = (ex: MathExercise) => (ex.kind === "time" ? hm(ex.answer) : `${fmt(ex.answer, 3)} ${ex.unit}`);
+const expected = (ex: MathExercise) => (ex.kind === "time" ? hm(ex.answer) : `${fmt(ex.answer, 4)} ${ex.unit}`);
 
 export function ExerciseCard({
   label,
@@ -17,6 +17,7 @@ export function ExerciseCard({
   onNext,
   autoFocus = false,
   bare = false,
+  noHint = false,
 }: {
   label?: string;
   ex: MathExercise;
@@ -24,6 +25,7 @@ export function ExerciseCard({
   onNext?: () => void;
   autoFocus?: boolean;
   bare?: boolean;
+  noHint?: boolean;
 }) {
   const [value, setValue] = useState("");
   const [result, setResult] = useState<null | boolean>(null);
@@ -65,10 +67,12 @@ export function ExerciseCard({
         {result === null ? (
           <div className="flex gap-2">
             <Button type="submit">Vérifier</Button>
-            <Button type="button" variant="ghost" onClick={() => setShowSteps((s) => !s)}>
-              <Lightbulb className="h-4 w-4 sm:mr-1" />
-              <span className="hidden sm:inline">Solution</span>
-            </Button>
+            {!noHint && (
+              <Button type="button" variant="ghost" onClick={() => setShowSteps((s) => !s)}>
+                <Lightbulb className="h-4 w-4 sm:mr-1" />
+                <span className="hidden sm:inline">Solution</span>
+              </Button>
+            )}
           </div>
         ) : (
           onNext && <Button type="submit">Suivant</Button>

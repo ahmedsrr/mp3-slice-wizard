@@ -438,3 +438,73 @@ const problemTemplates: (() => MathProblem)[] = [
 ];
 
 export const generateProblem = () => pick(problemTemplates)();
+
+export type OpKind = "+" | "−" | "×" | "÷";
+
+const F3 = (n: number) => fmt(n, 3);
+/** Nombre aléatoire avec `dec` décimales, renvoyé en millièmes (entier) pour des calculs exacts. */
+const milli = (minInt: number, maxInt: number, dec: number) => {
+  const scale = 10 ** dec;
+  return rnd(minInt * scale, maxInt * scale) * (1000 / scale);
+};
+
+/** Opérations « posées » de niveau concours : décimaux, grands nombres, divisions exactes. */
+export function generateOperation(op: OpKind): MathExercise {
+  if (op === "+") {
+    const xs = [milli(1000, 99999, rnd(1, 3)), milli(100, 9999, rnd(0, 2)), milli(10, 999, rnd(1, 3))];
+    const s = xs.reduce((a, b) => a + b, 0);
+    return {
+      statement: `Pose et effectue : ${xs.map((x) => F3(x / 1000)).join(" + ")}`,
+      answer: s / 1000,
+      unit: "",
+      steps: ["On aligne les virgules (on peut compléter par des zéros).", `${xs.map((x) => F3(x / 1000)).join(" + ")} = ${F3(s / 1000)}`],
+    };
+  }
+  if (op === "−") {
+    const a = milli(10000, 99999, rnd(0, 2)), b = milli(1000, Math.floor(a / 1000) - 1, rnd(1, 3));
+    return {
+      statement: `Pose et effectue : ${F3(a / 1000)} − ${F3(b / 1000)}`,
+      answer: (a - b) / 1000,
+      unit: "",
+      steps: ["On aligne les virgules et on complète le premier nombre par des zéros si besoin.", `${F3(a / 1000)} − ${F3(b / 1000)} = ${F3((a - b) / 1000)}`],
+    };
+  }
+  if (op === "×") {
+    if (rnd(0, 1)) {
+      const a = rnd(1000, 9999), b = rnd(102, 989);
+      return { statement: `Pose et effectue : ${fmt(a)} × ${b}`, answer: a * b, unit: "", steps: [`On multiplie par chaque chiffre de ${b} en décalant d'un rang à chaque ligne.`, `${fmt(a)} × ${b} = ${fmt(a * b)}`] };
+    }
+    const da = rnd(1, 2), db = rnd(1, 2);
+    const ia = rnd(100, 9999), ib = rnd(12, 999);
+    const p = ia * ib, dec = da + db;
+    return {
+      statement: `Pose et effectue : ${F3(ia / 10 ** da)} × ${F3(ib / 10 ** db)}`,
+      answer: p / 10 ** dec,
+      unit: "",
+      steps: [`On multiplie sans les virgules : ${fmt(ia)} × ${fmt(ib)} = ${fmt(p)}`, `${da} + ${db} = ${dec} chiffres après la virgule → ${fmt(p / 10 ** dec, 4)}`],
+    };
+  }
+  const decDivisor = rnd(0, 1);
+  const di = rnd(12, 98) + (decDivisor ? 0 : rnd(0, 1) * 100);
+  const qi = rnd(100, 9999), qdec = rnd(0, 2);
+  const divisor = decDivisor ? di / 10 : di;
+  const q = qi / 10 ** qdec;
+  const dividend = Math.round(q * divisor * 1000) / 1000;
+  return {
+    statement: `Pose et effectue la division (le quotient est exact) : ${F3(dividend)} ÷ ${fmt(divisor)}`,
+    answer: q,
+    unit: "",
+    steps: [
+      ...(decDivisor ? [`Le diviseur est décimal : on multiplie les deux nombres par 10 → ${F3(dividend * 10)} ÷ ${di}`] : []),
+      "On divise chiffre par chiffre ; on place la virgule au quotient quand on abaisse le premier chiffre après la virgule.",
+      `Quotient : ${F3(q)}`,
+      `Vérification : ${F3(q)} × ${fmt(divisor)} = ${F3(dividend)}`,
+    ],
+  };
+}
+
+mathTopics.unshift({
+  id: "quatre-operations",
+  title: "Les 4 opérations posées",
+  generate: () => generateOperation(pick<OpKind>(["+", "−", "×", "÷"])),
+});

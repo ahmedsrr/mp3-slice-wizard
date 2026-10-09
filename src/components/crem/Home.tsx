@@ -15,7 +15,7 @@ const semaine = [
   { jour: "Lundi", tache: "Maths : 20 exercices par thème + 1 problème complet" },
   { jour: "Mardi", tache: "TSQ : 1 texte complet chronométré" },
   { jour: "Mercredi", tache: "Dissertation : 2 plans détaillés + 3 « type de plan »" },
-  { jour: "Jeudi", tache: "TSQ : 20 QCM de langue + 10 phrases à corriger" },
+  { jour: "Jeudi", tache: "Langue : analyse grammaticale et logique + 15 participes passés" },
   { jour: "Vendredi", tache: "Dissertation : copie complète en 3 h" },
   { jour: "Samedi", tache: "Examen blanc maths ou TSQ" },
   { jour: "Dimanche", tache: "Repos, ou 2 introductions de 20 min" },
