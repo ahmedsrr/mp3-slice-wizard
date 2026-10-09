@@ -90,3 +90,11 @@ export function parseAnswer(s: string): number | null {
 }
 
 export const isClose = (a: number, b: number) => Math.abs(a - b) <= Math.max(0.011, Math.abs(b) * 1e-4);
+
+/** Lit une heure saisie « 14h30 », « 14:30 », « 14 h 05 » ou « 9h » → minutes depuis minuit. */
+export function parseTime(s: string): number | null {
+  const m = s.trim().toLowerCase().match(/^(\d{1,2})\s*(?:h|:)\s*(\d{0,2})\s*(?:min)?$/);
+  if (!m) return null;
+  const h = Number(m[1]), min = m[2] ? Number(m[2]) : 0;
+  return h < 24 && min < 60 ? h * 60 + min : null;
+}

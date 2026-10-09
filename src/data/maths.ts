@@ -5,12 +5,20 @@ export type MathExercise = {
   answer: number;
   unit: string;
   steps: string[];
+  /** "time" : réponse en minutes depuis minuit, saisie au format 14h30 */
+  kind?: "time";
+};
+
+export type MathProblem = {
+  id: string;
+  title: string;
+  context: string;
+  parts: MathExercise[];
 };
 
 export type MathTopic = {
   id: string;
   title: string;
-  fiche: { rule: string; formulas: string[]; example: string; pieges: string[] };
   generate: () => MathExercise;
 };
 
@@ -19,6 +27,8 @@ const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
 const round = (n: number, d = 2) => Math.round(n * 10 ** d) / 10 ** d;
 const F = (n: number) => `${fmt(n)} F`;
 const prenoms = ["Awa", "Moussa", "Fatou", "Ousmane", "Aminata", "Ibrahima", "Khady", "Mamadou", "Ndèye", "Cheikh", "Mariama", "Abdou"];
+export const hm = (min: number) => `${Math.floor(min / 60) % 24} h ${String(min % 60).padStart(2, "0")}`;
+const dur = (min: number) => (min >= 60 ? `${Math.floor(min / 60)} h${min % 60 ? ` ${String(min % 60).padStart(2, "0")} min` : ""}` : `${min} min`);
 const villes: [string, string][] = [
   ["Dakar", "Thiès"],
   ["Kaolack", "Fatick"],
@@ -32,16 +42,6 @@ export const mathTopics: MathTopic[] = [
   {
     id: "operations",
     title: "Opérations & décimaux",
-    fiche: {
-      rule: "Pose les opérations en alignant les virgules. Pour multiplier des décimaux, on multiplie sans virgule puis on place autant de chiffres après la virgule qu'il y en a au total dans les facteurs. Pour diviser par un décimal, on multiplie dividende et diviseur par 10, 100… pour rendre le diviseur entier.",
-      formulas: [
-        "Priorités : parenthèses → × et ÷ → + et −",
-        "a ÷ 0,5 = a × 2 ; a ÷ 0,25 = a × 4 ; a × 0,1 = a ÷ 10",
-        "Multiplier par 10, 100, 1 000 : la virgule avance de 1, 2, 3 rangs",
-      ],
-      example: "12,5 × 0,4 → 125 × 4 = 500 → 2 chiffres après la virgule → 5,00 = 5",
-      pieges: ["Oublier les priorités opératoires", "Mal placer la virgule dans le produit", "Diviser par un décimal sans transformer le diviseur"],
-    },
     generate: () => {
       const kind = rnd(0, 3);
       if (kind === 0) {
@@ -69,12 +69,6 @@ export const mathTopics: MathTopic[] = [
   {
     id: "fractions",
     title: "Fractions",
-    fiche: {
-      rule: "Prendre une fraction d'une quantité : on divise par le dénominateur puis on multiplie par le numérateur. Pour additionner des fractions, on les met au même dénominateur.",
-      formulas: ["a/b de Q = (Q ÷ b) × a", "a/b + c/d = (ad + cb) / bd", "Fraction restante = 1 − fractions utilisées", "Si a/b de Q = R alors Q = R ÷ a × b"],
-      example: "3/4 de 840 = (840 ÷ 4) × 3 = 210 × 3 = 630",
-      pieges: ["Calculer la fraction du reste et non du total", "Oublier de réduire au même dénominateur"],
-    },
     generate: () => {
       const kind = rnd(0, 2);
       if (kind === 0) {
@@ -105,12 +99,6 @@ export const mathTopics: MathTopic[] = [
   {
     id: "pourcentages",
     title: "Pourcentages",
-    fiche: {
-      rule: "Un pourcentage est une fraction de dénominateur 100. Remise ou augmentation se calculent sur le prix initial.",
-      formulas: ["t % de Q = Q × t ÷ 100", "Prix après remise = P × (100 − t) ÷ 100", "Prix après hausse = P × (100 + t) ÷ 100", "Taux = (part ÷ total) × 100", "Prix initial = prix réduit × 100 ÷ (100 − t)"],
-      example: "Un pagne à 12 500 F soldé à 20 % : remise = 2 500 F, prix payé = 10 000 F",
-      pieges: ["Calculer le prix initial en ajoutant t % au prix réduit (faux !)", "Confondre la remise et le prix payé"],
-    },
     generate: () => {
       const kind = rnd(0, 3);
       const objets = ["un pagne", "un sac de riz", "une bicyclette", "un téléphone", "une machine à coudre", "un mouton"];
@@ -138,12 +126,6 @@ export const mathTopics: MathTopic[] = [
   {
     id: "proportionnalite",
     title: "Proportionnalité & règle de trois",
-    fiche: {
-      rule: "Deux grandeurs sont proportionnelles si l'on passe de l'une à l'autre en multipliant toujours par le même nombre. Méthode du retour à l'unité : on calcule la valeur pour 1, puis pour la quantité demandée.",
-      formulas: ["Valeur cherchée = (valeur connue ÷ quantité connue) × quantité demandée", "Produit en croix : a/b = c/x ⇒ x = b × c ÷ a", "Proportionnalité inverse (ouvriers/jours) : n₁ × j₁ = n₂ × j₂"],
-      example: "5 kg de riz coûtent 2 250 F → 1 kg = 450 F → 8 kg = 3 600 F",
-      pieges: ["Utiliser la règle de trois directe pour une situation inverse (plus d'ouvriers = moins de jours)"],
-    },
     generate: () => {
       if (rnd(0, 2) > 0) {
         const pu = rnd(3, 120) * 25, a = rnd(2, 9), b = rnd(3, 15);
@@ -164,12 +146,6 @@ export const mathTopics: MathTopic[] = [
   {
     id: "vitesse",
     title: "Vitesse, distance, durée",
-    fiche: {
-      rule: "Convertis toujours la durée en heures décimales (ou en minutes) avant de calculer. 1 h = 60 min ; 15 min = 0,25 h ; 20 min = 1/3 h ; 30 min = 0,5 h ; 45 min = 0,75 h.",
-      formulas: ["d = v × t", "v = d ÷ t", "t = d ÷ v", "Heure d'arrivée = heure de départ + durée (+ arrêts)", "Rencontre (sens contraires) : t = d ÷ (v₁ + v₂)"],
-      example: "Un car roule à 75 km/h pendant 2 h 24 min : 2 h 24 = 2,4 h → d = 75 × 2,4 = 180 km",
-      pieges: ["Écrire 2 h 24 min = 2,24 h (faux : 2,4 h)", "Oublier les temps d'arrêt"],
-    },
     generate: () => {
       const [A, B] = pick(villes);
       const kind = rnd(0, 2);
@@ -197,12 +173,6 @@ export const mathTopics: MathTopic[] = [
   {
     id: "mesures",
     title: "Conversions de mesures",
-    fiche: {
-      rule: "Utilise un tableau de conversion. Longueurs et masses : 1 colonne par unité. Aires : 2 colonnes par unité. Volumes : 3 colonnes par unité.",
-      formulas: ["km hm dam m dm cm mm (×10)", "1 m² = 100 dm² ; 1 ha = 1 hm² = 10 000 m² ; 1 a = 100 m²", "1 m³ = 1 000 dm³ ; 1 dm³ = 1 L ; 1 cm³ = 1 mL", "1 t = 1 000 kg ; 1 q = 100 kg"],
-      example: "2,5 ha = 25 000 m² ; 3,2 m³ = 3 200 L",
-      pieges: ["Convertir des aires avec 1 seul chiffre par colonne", "Confondre dm³ et cm³ avec le litre"],
-    },
     generate: () => {
       const items: (() => MathExercise)[] = [
         () => { const a = round(rnd(1, 500) / 100); return { statement: `Convertis ${fmt(a)} km en m.`, answer: round(a * 1000), unit: "m", steps: [`1 km = 1 000 m → ${fmt(a)} × 1 000 = ${fmt(a * 1000)} m`] }; },
@@ -219,12 +189,6 @@ export const mathTopics: MathTopic[] = [
   {
     id: "geometrie",
     title: "Périmètres & aires",
-    fiche: {
-      rule: "Le périmètre est la longueur du contour (unité : m). L'aire est la surface (unité : m²). Vérifie que toutes les longueurs sont dans la même unité.",
-      formulas: ["Carré : P = 4c ; A = c × c", "Rectangle : P = 2(L + l) ; A = L × l", "Triangle : A = b × h ÷ 2", "Trapèze : A = (B + b) × h ÷ 2", "Losange : A = D × d ÷ 2", "Cercle : P = D × 3,14 ; A = r × r × 3,14"],
-      example: "Champ rectangulaire 45 m × 30 m : P = 150 m ; A = 1 350 m²",
-      pieges: ["Confondre rayon et diamètre", "Oublier de diviser par 2 pour le triangle"],
-    },
     generate: () => {
       const kind = rnd(0, 4);
       if (kind === 0) {
@@ -250,12 +214,6 @@ export const mathTopics: MathTopic[] = [
   {
     id: "volumes",
     title: "Volumes & capacités",
-    fiche: {
-      rule: "Le volume d'un solide droit = aire de la base × hauteur. Pour obtenir des litres, convertis en dm³.",
-      formulas: ["Pavé droit : V = L × l × h", "Cube : V = a × a × a", "Cylindre : V = r × r × 3,14 × h", "1 dm³ = 1 L ; 1 m³ = 1 000 L"],
-      example: "Bassin de 3 m × 2 m × 1,5 m : V = 9 m³ = 9 000 L",
-      pieges: ["Mélanger m et cm dans le même calcul", "Oublier de convertir m³ → L"],
-    },
     generate: () => {
       if (rnd(0, 1)) {
         const L = rnd(2, 8), l = rnd(1, L), h = pick([0.5, 1, 1.2, 1.5, 2]);
@@ -270,12 +228,6 @@ export const mathTopics: MathTopic[] = [
   {
     id: "partages",
     title: "Partages & moyennes",
-    fiche: {
-      rule: "Somme et différence connues : le plus grand = (S + D) ÷ 2 ; le plus petit = (S − D) ÷ 2. Partage proportionnel : on divise la somme par le total des parts.",
-      formulas: ["Grand = (S + D) ÷ 2 ; Petit = (S − D) ÷ 2", "Une part = Somme ÷ nombre total de parts", "Moyenne = somme des valeurs ÷ nombre de valeurs", "Si l'un a le double de l'autre : 3 parts au total"],
-      example: "Partager 50 000 F entre Awa et Moussa, Awa ayant 8 000 F de plus : Awa = 29 000 F, Moussa = 21 000 F",
-      pieges: ["Oublier de vérifier : la somme des parts doit redonner le total"],
-    },
     generate: () => {
       const kind = rnd(0, 2);
       const p1 = pick(prenoms);
@@ -296,12 +248,6 @@ export const mathTopics: MathTopic[] = [
   {
     id: "commerce",
     title: "Achat, vente & intérêts",
-    fiche: {
-      rule: "Prix de revient = prix d'achat + frais. Bénéfice = prix de vente − prix de revient (perte si négatif). L'intérêt simple est proportionnel au capital, au taux et à la durée.",
-      formulas: ["PR = PA + frais", "B = PV − PR", "% de bénéfice (sur le PR) = B ÷ PR × 100", "Intérêt annuel : I = C × t ÷ 100", "Sur n mois : I = C × t × n ÷ 1 200", "Sur j jours : I = C × t × j ÷ 36 000"],
-      example: "Capital 200 000 F à 6 % pendant 9 mois : I = 200 000 × 6 × 9 ÷ 1 200 = 9 000 F",
-      pieges: ["Calculer le % de bénéfice sur le prix de vente au lieu du prix de revient (sauf si l'énoncé le précise)"],
-    },
     generate: () => {
       const kind = rnd(0, 2);
       if (kind === 0) {
@@ -321,12 +267,6 @@ export const mathTopics: MathTopic[] = [
   {
     id: "echelles",
     title: "Échelles & plans",
-    fiche: {
-      rule: "L'échelle 1/n signifie que 1 cm sur le plan représente n cm en réalité. Travaille en cm puis convertis.",
-      formulas: ["Distance réelle = distance plan × n", "Distance plan = distance réelle ÷ n", "Échelle = distance plan ÷ distance réelle (même unité)", "1 km = 100 000 cm"],
-      example: "Carte au 1/50 000 : 6 cm → 300 000 cm = 3 km",
-      pieges: ["Ne pas mettre les deux distances dans la même unité avant de calculer l'échelle"],
-    },
     generate: () => {
       if (rnd(0, 1)) {
         const n = pick([10000, 25000, 50000, 100000, 200000]), d = round(rnd(10, 150) / 10);
@@ -337,9 +277,234 @@ export const mathTopics: MathTopic[] = [
       return { statement: `Sur un plan à l'échelle 1/${n}, une salle de classe mesure ${fmt((L * 100) / n)} cm de long. Quelle est sa longueur réelle en m ?`, answer: L, unit: "m", steps: [`${fmt((L * 100) / n)} × ${n} = ${L * 100} cm = ${L} m`] };
     },
   },
+  {
+    id: "durees",
+    title: "Durées & horaires",
+    generate: () => {
+      const kind = rnd(0, 2);
+      if (kind === 0) {
+        const dep = rnd(5 * 4, 15 * 4) * 15, d = rnd(5, 40) * 5 + rnd(0, 1) * 60 * rnd(1, 4);
+        return { statement: `Un car quitte la gare routière à ${hm(dep)}. Le trajet dure ${dur(d)}. À quelle heure arrive-t-il ?`, answer: dep + d, unit: "", kind: "time", steps: [`${hm(dep)} + ${dur(d)} = ${hm(dep + d)}`] };
+      }
+      if (kind === 1) {
+        const a = rnd(7 * 12, 12 * 12) * 5, b = a + rnd(10, 60) * 5;
+        return { statement: `Un cours commence à ${hm(a)} et se termine à ${hm(b)}. Quelle est sa durée en minutes ?`, answer: b - a, unit: "min", steps: [`De ${hm(a)} à ${hm(b)} : ${dur(b - a)} = ${b - a} min`] };
+      }
+      const d = rnd(3, 9) * 30, arr = rnd(10 * 4, 20 * 4) * 15, stop = pick([15, 20, 30]);
+      return { statement: `Une famille veut arriver à Touba à ${hm(arr)}. Le trajet dure ${dur(d)} avec en plus une pause de ${stop} min. À quelle heure doit-elle partir au plus tard ?`, answer: arr - d - stop, unit: "", kind: "time", steps: [`Durée totale : ${dur(d)} + ${stop} min = ${dur(d + stop)}`, `${hm(arr)} − ${dur(d + stop)} = ${hm(arr - d - stop)}`] };
+    },
+  },
+  {
+    id: "intervalles",
+    title: "Intervalles & multiples",
+    generate: () => {
+      const kind = rnd(0, 2);
+      if (kind === 0) {
+        const e = pick([2, 3, 4, 5]), n = rnd(10, 60);
+        return { statement: `On plante des arbres en ligne droite le long d'une allée de ${e * n} m, en mettant un arbre à chaque extrémité. Les arbres sont espacés de ${e} m. Combien faut-il d'arbres ?`, answer: n + 1, unit: "arbres", steps: [`Nombre d'intervalles : ${e * n} ÷ ${e} = ${n}`, `Sur une ligne ouverte : arbres = intervalles + 1 = ${n + 1}`] };
+      }
+      if (kind === 1) {
+        const e = pick([2, 2.5, 3, 4, 5]), L = rnd(10, 40) * 2, l = rnd(5, 20) * 2;
+        const P = 2 * (L + l), n = P / e;
+        if (!Number.isInteger(n)) return mathTopics.find((t) => t.id === "intervalles")!.generate();
+        return { statement: `On clôture un champ rectangulaire de ${L} m sur ${l} m avec des piquets espacés de ${fmt(e)} m. Combien faut-il de piquets ?`, answer: n, unit: "piquets", steps: [`Périmètre : 2 × (${L} + ${l}) = ${P} m`, `Sur un contour fermé : piquets = intervalles = ${P} ÷ ${fmt(e)} = ${n}`] };
+      }
+      const pairs: [number, number, number][] = [[12, 18, 36], [10, 15, 30], [8, 12, 24], [15, 20, 60], [6, 9, 18], [20, 30, 60], [12, 16, 48]];
+      const [a, b, m] = pick(pairs), dep = rnd(6 * 4, 8 * 4) * 15;
+      return { statement: `À ${hm(dep)}, deux cars partent ensemble de la gare. L'un repart toutes les ${a} min, l'autre toutes les ${b} min. À quelle heure repartiront-ils de nouveau ensemble ?`, answer: dep + m, unit: "", kind: "time", steps: [`Plus petit multiple commun de ${a} et ${b} : ${m} min`, `${hm(dep)} + ${m} min = ${hm(dep + m)}`] };
+    },
+  },
+  {
+    id: "ages",
+    title: "Âges & nombres",
+    generate: () => {
+      const kind = rnd(0, 2);
+      const p = pick(prenoms);
+      if (kind === 0) {
+        const e = rnd(5, 15), k = pick([3, 4, 5]), n = rnd(2, 10);
+        return { statement: `${p} a ${e} ans et son père a ${k} fois son âge. Quel âge aura le père dans ${n} ans ?`, answer: e * k + n, unit: "ans", steps: [`Âge du père : ${e} × ${k} = ${e * k} ans`, `Dans ${n} ans : ${e * k} + ${n} = ${e * k + n} ans`] };
+      }
+      if (kind === 1) {
+        const enfant = rnd(6, 16), d = rnd(20, 35);
+        return { statement: `La somme des âges d'une mère et de sa fille est ${2 * enfant + d} ans. La mère a ${d} ans de plus que sa fille. Quel est l'âge de la fille ?`, answer: enfant, unit: "ans", steps: [`Fille = (somme − différence) ÷ 2`, `(${2 * enfant + d} − ${d}) ÷ 2 = ${enfant} ans`] };
+      }
+      const x = rnd(5, 40), a = rnd(2, 6), b = rnd(3, 30);
+      return { statement: `Je pense à un nombre. Je le multiplie par ${a} puis j'ajoute ${b} : j'obtiens ${a * x + b}. Quel est ce nombre ?`, answer: x, unit: "", steps: [`On remonte les opérations : ${a * x + b} − ${b} = ${a * x}`, `${a * x} ÷ ${a} = ${x}`] };
+    },
+  },
 ];
 
 export const generateExercise = (topicId?: string) => {
   const topic = topicId ? mathTopics.find((t) => t.id === topicId)! : pick(mathTopics);
   return { topic, ex: topic.generate() };
 };
+
+const problemTemplates: (() => MathProblem)[] = [
+  () => {
+    const L = rnd(8, 30) * 5, l = rnd(4, L / 5 - 1) * 5, prixM = pick([600, 750, 900, 1200]), rdt = pick([8, 10, 12, 15]), prixKg = pick([250, 300, 350, 400]);
+    const P = 2 * (L + l), A = L * l, recolte = (A * rdt) / 10;
+    const p = pick(prenoms);
+    return {
+      id: "champ",
+      title: "Le champ d'arachide",
+      context: `${p} possède un champ rectangulaire de ${L} m de long et ${l} m de large et veut le clôturer avec du grillage vendu à ${F(prixM)} le mètre. Le champ produit en moyenne ${rdt} kg d'arachide pour 10 m², vendus ${F(prixKg)} le kg.`,
+      parts: [
+        { statement: "Calcule le périmètre du champ.", answer: P, unit: "m", steps: [`P = 2 × (${L} + ${l}) = ${P} m`] },
+        { statement: "Combien coûte le grillage ?", answer: P * prixM, unit: "F", steps: [`${P} × ${F(prixM)} = ${F(P * prixM)}`] },
+        { statement: "Calcule la superficie du champ en ares.", answer: A / 100, unit: "a", steps: [`A = ${L} × ${l} = ${fmt(A)} m²`, `1 a = 100 m² → ${fmt(A / 100)} a`] },
+        { statement: "Quelle masse d'arachide récolte-t-on ?", answer: recolte, unit: "kg", steps: [`${fmt(A)} ÷ 10 = ${fmt(A / 10)} groupes de 10 m²`, `${fmt(A / 10)} × ${rdt} = ${fmt(recolte)} kg`] },
+        { statement: "Quel est le montant de la vente de la récolte ?", answer: recolte * prixKg, unit: "F", steps: [`${fmt(recolte)} × ${F(prixKg)} = ${F(recolte * prixKg)}`] },
+      ],
+    };
+  },
+  () => {
+    const [A, B] = pick(villes), v = pick([60, 72, 75, 80, 90]), t = pick([90, 120, 150, 180, 240]), pause = pick([15, 20, 30]);
+    const d = (v * t) / 60, dep = rnd(6 * 4, 9 * 4) * 15, conso = pick([6, 7, 8, 9]), prixL = pick([680, 755, 920, 990]);
+    const litres = (d * conso) / 100;
+    return {
+      id: "voyage",
+      title: "Le voyage",
+      context: `Un taxi part de ${A} à ${hm(dep)} pour ${B} (trajet fictif). Il roule à la vitesse moyenne de ${v} km/h pendant ${dur(t)}, sans compter une pause de ${pause} min. Il consomme ${conso} L de carburant aux 100 km ; le litre coûte ${F(prixL)}.`,
+      parts: [
+        { statement: "Quelle distance parcourt-il ?", answer: d, unit: "km", steps: [`${dur(t)} = ${fmt(t / 60)} h`, `d = ${v} × ${fmt(t / 60)} = ${fmt(d)} km`] },
+        { statement: "À quelle heure arrive-t-il ?", answer: dep + t + pause, unit: "", kind: "time", steps: [`${hm(dep)} + ${dur(t)} + ${pause} min = ${hm(dep + t + pause)}`] },
+        { statement: "Combien de litres de carburant consomme-t-il ?", answer: round(litres), unit: "L", steps: [`${fmt(d)} × ${conso} ÷ 100 = ${fmt(litres)} L`] },
+        { statement: "Combien dépense-t-il en carburant ?", answer: round(litres * prixL), unit: "F", steps: [`${fmt(litres)} × ${F(prixL)} = ${F(round(litres * prixL))}`] },
+      ],
+    };
+  },
+  () => {
+    const n = rnd(4, 20) * 5, pa = rnd(10, 40) * 500, frais = rnd(4, 40) * 1000, marge = pick([10, 15, 20, 25]);
+    const pr = n * pa + frais, pv = (pr * (100 + marge)) / 100;
+    return {
+      id: "commercant",
+      title: "Le commerçant",
+      context: `Une commerçante du marché Sandaga achète ${n} pagnes à ${F(pa)} l'un. Elle paie ${F(frais)} de transport et de taxes. Elle veut réaliser un bénéfice de ${marge} % du prix de revient.`,
+      parts: [
+        { statement: "Quel est le prix d'achat total ?", answer: n * pa, unit: "F", steps: [`${n} × ${F(pa)} = ${F(n * pa)}`] },
+        { statement: "Quel est le prix de revient ?", answer: pr, unit: "F", steps: [`${F(n * pa)} + ${F(frais)} = ${F(pr)}`] },
+        { statement: "Quel bénéfice veut-elle réaliser ?", answer: (pr * marge) / 100, unit: "F", steps: [`${F(pr)} × ${marge} ÷ 100 = ${F((pr * marge) / 100)}`] },
+        { statement: "À quel prix doit-elle vendre chaque pagne ?", answer: round(pv / n), unit: "F", steps: [`Prix de vente total : ${F(pv)}`, `${F(pv)} ÷ ${n} = ${F(round(pv / n))}`] },
+      ],
+    };
+  },
+  () => {
+    const L = rnd(7, 12), l = rnd(5, L - 1), c = pick([20, 25, 50]), prixC = pick([350, 500, 650]), parCarton = pick([16, 20, 25]);
+    const A = L * l, carreaux = (A * 10000) / (c * c), cartons = Math.ceil(carreaux / parCarton);
+    return {
+      id: "classe",
+      title: "La salle de classe",
+      context: `On veut carreler une salle de classe rectangulaire de ${L} m sur ${l} m avec des carreaux carrés de ${c} cm de côté. Les carreaux sont vendus par cartons de ${parCarton} ; un carton coûte ${F(prixC * parCarton)}.`,
+      parts: [
+        { statement: "Calcule l'aire de la salle.", answer: A, unit: "m²", steps: [`${L} × ${l} = ${A} m²`] },
+        { statement: "Calcule l'aire d'un carreau en cm².", answer: c * c, unit: "cm²", steps: [`${c} × ${c} = ${c * c} cm²`] },
+        { statement: "Combien de carreaux faut-il ?", answer: carreaux, unit: "carreaux", steps: [`${A} m² = ${fmt(A * 10000)} cm²`, `${fmt(A * 10000)} ÷ ${c * c} = ${fmt(carreaux)}`] },
+        { statement: "Combien de cartons faut-il acheter ?", answer: cartons, unit: "cartons", steps: [`${fmt(carreaux)} ÷ ${parCarton} = ${fmt(carreaux / parCarton)}`, `On arrondit à l'entier supérieur : ${cartons} cartons`] },
+        { statement: "Quel est le coût des carreaux ?", answer: cartons * prixC * parCarton, unit: "F", steps: [`${cartons} × ${F(prixC * parCarton)} = ${F(cartons * prixC * parCarton)}`] },
+      ],
+    };
+  },
+  () => {
+    const L = rnd(2, 6), l = rnd(1, L), h = pick([1, 1.5, 2]), debit = pick([10, 20, 25, 40, 50]), prixM3 = pick([200, 300, 450]);
+    const V = L * l * h, litres = V * 1000, minutes = litres / debit;
+    return {
+      id: "reservoir",
+      title: "Le réservoir de l'école",
+      context: `Le réservoir d'eau de l'école est un pavé droit de ${L} m de long, ${l} m de large et ${fmt(h)} m de haut. Un robinet le remplit avec un débit de ${debit} litres par minute. Le mètre cube d'eau coûte ${F(prixM3)}.`,
+      parts: [
+        { statement: "Calcule le volume du réservoir en m³.", answer: V, unit: "m³", steps: [`${L} × ${l} × ${fmt(h)} = ${fmt(V)} m³`] },
+        { statement: "Quelle est sa capacité en litres ?", answer: litres, unit: "L", steps: [`1 m³ = 1 000 L → ${fmt(litres)} L`] },
+        { statement: "Combien de minutes faut-il pour le remplir complètement ?", answer: round(minutes), unit: "min", steps: [`${fmt(litres)} ÷ ${debit} = ${fmt(minutes)} min`] },
+        { statement: "Combien coûte un remplissage complet ?", answer: V * prixM3, unit: "F", steps: [`${fmt(V)} × ${F(prixM3)} = ${F(V * prixM3)}`] },
+      ],
+    };
+  },
+  () => {
+    const sal = rnd(15, 40) * 6000, t = pick([3, 4, 5, 6]);
+    const loyer = sal / 3, nour = (sal - loyer) / 2, reste = sal - loyer - nour, an = reste * 12, I = (an * t) / 100;
+    const p = pick(prenoms);
+    return {
+      id: "salaire",
+      title: "Le budget de l'enseignant",
+      context: `${p}, jeune enseignant(e), gagne ${F(sal)} par mois. Le tiers du salaire sert au loyer, la moitié du reste à la nourriture, et ${p} épargne tout ce qui reste. L'épargne d'une année est placée à ${t} % par an.`,
+      parts: [
+        { statement: "Quel est le montant du loyer ?", answer: loyer, unit: "F", steps: [`${F(sal)} ÷ 3 = ${F(loyer)}`] },
+        { statement: "Combien est consacré à la nourriture ?", answer: nour, unit: "F", steps: [`Reste : ${F(sal - loyer)}`, `${F(sal - loyer)} ÷ 2 = ${F(nour)}`] },
+        { statement: "Quelle est l'épargne annuelle ?", answer: an, unit: "F", steps: [`Épargne mensuelle : ${F(reste)}`, `× 12 = ${F(an)}`] },
+        { statement: "Quel intérêt rapporte cette épargne en un an ?", answer: round(I), unit: "F", steps: [`${F(an)} × ${t} ÷ 100 = ${F(round(I))}`] },
+      ],
+    };
+  },
+];
+
+export const generateProblem = () => pick(problemTemplates)();
+
+export type OpKind = "+" | "−" | "×" | "÷";
+
+const F3 = (n: number) => fmt(n, 3);
+/** Nombre aléatoire avec `dec` décimales, renvoyé en millièmes (entier) pour des calculs exacts. */
+const milli = (minInt: number, maxInt: number, dec: number) => {
+  const scale = 10 ** dec;
+  return rnd(minInt * scale, maxInt * scale) * (1000 / scale);
+};
+
+/** Opérations « posées » de niveau concours : décimaux, grands nombres, divisions exactes. */
+export function generateOperation(op: OpKind): MathExercise {
+  if (op === "+") {
+    const xs = [milli(1000, 99999, rnd(1, 3)), milli(100, 9999, rnd(0, 2)), milli(10, 999, rnd(1, 3))];
+    const s = xs.reduce((a, b) => a + b, 0);
+    return {
+      statement: `Pose et effectue : ${xs.map((x) => F3(x / 1000)).join(" + ")}`,
+      answer: s / 1000,
+      unit: "",
+      steps: ["On aligne les virgules (on peut compléter par des zéros).", `${xs.map((x) => F3(x / 1000)).join(" + ")} = ${F3(s / 1000)}`],
+    };
+  }
+  if (op === "−") {
+    const a = milli(10000, 99999, rnd(0, 2)), b = milli(1000, Math.floor(a / 1000) - 1, rnd(1, 3));
+    return {
+      statement: `Pose et effectue : ${F3(a / 1000)} − ${F3(b / 1000)}`,
+      answer: (a - b) / 1000,
+      unit: "",
+      steps: ["On aligne les virgules et on complète le premier nombre par des zéros si besoin.", `${F3(a / 1000)} − ${F3(b / 1000)} = ${F3((a - b) / 1000)}`],
+    };
+  }
+  if (op === "×") {
+    if (rnd(0, 1)) {
+      const a = rnd(1000, 9999), b = rnd(102, 989);
+      return { statement: `Pose et effectue : ${fmt(a)} × ${b}`, answer: a * b, unit: "", steps: [`On multiplie par chaque chiffre de ${b} en décalant d'un rang à chaque ligne.`, `${fmt(a)} × ${b} = ${fmt(a * b)}`] };
+    }
+    const da = rnd(1, 2), db = rnd(1, 2);
+    const ia = rnd(100, 9999), ib = rnd(12, 999);
+    const p = ia * ib, dec = da + db;
+    return {
+      statement: `Pose et effectue : ${F3(ia / 10 ** da)} × ${F3(ib / 10 ** db)}`,
+      answer: p / 10 ** dec,
+      unit: "",
+      steps: [`On multiplie sans les virgules : ${fmt(ia)} × ${fmt(ib)} = ${fmt(p)}`, `${da} + ${db} = ${dec} chiffres après la virgule → ${fmt(p / 10 ** dec, 4)}`],
+    };
+  }
+  const decDivisor = rnd(0, 1);
+  const di = rnd(12, 98) + (decDivisor ? 0 : rnd(0, 1) * 100);
+  const qi = rnd(100, 9999), qdec = rnd(0, 2);
+  const divisor = decDivisor ? di / 10 : di;
+  const q = qi / 10 ** qdec;
+  const dividend = Math.round(q * divisor * 1000) / 1000;
+  return {
+    statement: `Pose et effectue la division (le quotient est exact) : ${F3(dividend)} ÷ ${fmt(divisor)}`,
+    answer: q,
+    unit: "",
+    steps: [
+      ...(decDivisor ? [`Le diviseur est décimal : on multiplie les deux nombres par 10 → ${F3(dividend * 10)} ÷ ${di}`] : []),
+      "On divise chiffre par chiffre ; on place la virgule au quotient quand on abaisse le premier chiffre après la virgule.",
+      `Quotient : ${F3(q)}`,
+      `Vérification : ${F3(q)} × ${fmt(divisor)} = ${F3(dividend)}`,
+    ],
+  };
+}
+
+mathTopics.unshift({
+  id: "quatre-operations",
+  title: "Les 4 opérations posées",
+  generate: () => generateOperation(pick<OpKind>(["+", "−", "×", "÷"])),
+});

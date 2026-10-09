@@ -1,74 +1,4 @@
-export const methodSteps = [
-  {
-    title: "1. Analyser le sujet (15 min)",
-    points: [
-      "Recopie le sujet et souligne les mots clés ; définis chacun d'eux.",
-      "Repère le type de consigne : « Commentez » / « Expliquez » (analytique), « Discutez » / « Partagez-vous cet avis ? » (dialectique), « Quels sont… » (thématique).",
-      "Repère l'auteur de la citation et son contexte s'il y en a un.",
-      "Reformule le sujet avec tes propres mots pour être sûr de l'avoir compris.",
-    ],
-  },
-  {
-    title: "2. Formuler la problématique",
-    points: [
-      "C'est la question centrale que pose le sujet, souvent sous forme de tension : « Dans quelle mesure… ? », « En quoi… ? », « … ou bien … ? ».",
-      "Elle ne doit pas recopier le sujet, mais en faire apparaître l'enjeu.",
-    ],
-  },
-  {
-    title: "3. Chercher les idées et les exemples (30 min)",
-    points: [
-      "Fais un remue-méninges au brouillon : idées, arguments, exemples.",
-      "Varie les exemples : vécu scolaire, réalité sénégalaise et africaine, lectures (Mariama Bâ, Cheikh Hamidou Kane, Amadou Hampâté Bâ…), actualité, réformes éducatives.",
-      "Chaque argument = une idée + une explication + un exemple précis.",
-    ],
-  },
-  {
-    title: "4. Construire le plan",
-    points: [
-      "Plan dialectique (thèse / antithèse / synthèse) : pour « Discutez », « Partagez-vous ce point de vue ? ».",
-      "Plan analytique (constat / causes / conséquences / solutions) : pour un problème de société (abandon scolaire, violence…).",
-      "Plan thématique (aspects successifs) : pour « Quels sont les rôles de… ? ».",
-      "2 ou 3 parties, chacune avec 2 ou 3 arguments. Équilibre les parties.",
-    ],
-  },
-  {
-    title: "5. Rédiger l'introduction au propre",
-    points: [
-      "Amorce (phrase d'accroche générale, mais en lien direct avec le sujet).",
-      "Sujet posé : cite ou reformule le sujet entre guillemets.",
-      "Problématique : la question centrale.",
-      "Annonce du plan : « Nous verrons d'abord… puis… enfin… »",
-    ],
-  },
-  {
-    title: "6. Développement",
-    points: [
-      "Un paragraphe par argument, avec un alinéa.",
-      "Phrase d'introduction de partie et phrase de transition entre les parties.",
-      "Utilise des connecteurs logiques variés.",
-    ],
-  },
-  {
-    title: "7. Conclusion",
-    points: [
-      "Bilan : réponds clairement à la problématique.",
-      "Ouverture : élargis vers une question voisine (sans poser une nouvelle problématique impossible à traiter).",
-    ],
-  },
-  {
-    title: "8. Relecture (15 min)",
-    points: ["Orthographe, accords, conjugaison, ponctuation, majuscules.", "Lisibilité de l'écriture, propreté de la copie, marges.", "Vérifie que tu n'as pas oublié de répondre au sujet."],
-  },
-];
-
-export const timePlan = [
-  { label: "Analyse du sujet + problématique", min: 15 },
-  { label: "Recherche d'idées + plan détaillé", min: 35 },
-  { label: "Rédaction de l'introduction et de la conclusion au brouillon", min: 15 },
-  { label: "Rédaction au propre", min: 100 },
-  { label: "Relecture", min: 15 },
-];
+import { moreSubjects } from "./dissertationExtra";
 
 export const connecteurs = [
   { role: "Introduire / énumérer", words: ["D'abord", "Tout d'abord", "En premier lieu", "Ensuite", "Puis", "De plus", "En outre", "Par ailleurs", "Enfin"] },
@@ -102,7 +32,7 @@ export type Subject = {
   plan: { titre: string; idees: string[] }[];
 };
 
-export const subjects: Subject[] = [
+const baseSubjects: Subject[] = [
   {
     id: "ecole-prison",
     theme: "École et société",
@@ -312,3 +242,5 @@ export const grille = [
   "Je n'ai jamais écrit de phrase de plus de 3 lignes",
   "J'ai répondu au sujet posé sans hors-sujet",
 ];
+
+export const subjects: Subject[] = [...baseSubjects, ...moreSubjects];

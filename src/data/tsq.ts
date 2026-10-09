@@ -1,3 +1,5 @@
+import { moreDrills, moreTexts } from "./tsqExtra";
+
 export type TsqQuestion = {
   section: "Compréhension" | "Vocabulaire" | "Grammaire" | "Conjugaison" | "Orthographe" | "Production";
   q: string;
@@ -13,97 +15,7 @@ export type TsqText = {
   questions: TsqQuestion[];
 };
 
-export const tsqMethod = [
-  {
-    title: "1. Lire le texte deux fois",
-    body: "Première lecture : le sens général (thème, idée principale). Deuxième lecture, crayon en main : souligne les mots clés, les connecteurs, les mots difficiles. Ne commence jamais par les questions sans avoir compris le texte.",
-  },
-  {
-    title: "2. Répondre par des phrases complètes",
-    body: "Reprends les termes de la question dans ta réponse. Justifie avec le texte : cite entre guillemets ou indique la ligne. Une réponse juste mais non justifiée perd des points.",
-  },
-  {
-    title: "3. Vocabulaire : expliquer en contexte",
-    body: "Donne le sens du mot DANS le texte, pas une définition de dictionnaire. Tu peux proposer un synonyme de même nature (un verbe pour un verbe, un nom pour un nom).",
-  },
-  {
-    title: "4. Grammaire : nature ≠ fonction",
-    body: "La nature est ce que le mot EST (nom, verbe, adjectif…). La fonction est le RÔLE qu'il joue dans la phrase (sujet, COD, complément circonstanciel…). Lis bien ce que la question demande.",
-  },
-  {
-    title: "5. Gérer le temps (≈ 1 h)",
-    body: "10 min de lecture, 30 min pour les questions de compréhension et de langue, 15 min pour la production, 5 min de relecture (accords, ponctuation, majuscules).",
-  },
-];
-
-export const grammarSheets = [
-  {
-    title: "Natures des mots",
-    items: [
-      "Variables : nom, déterminant, adjectif qualificatif, pronom, verbe",
-      "Invariables : adverbe, préposition, conjonction de coordination (mais, ou, et, donc, or, ni, car), conjonction de subordination (que, quand, lorsque, puisque, si, comme…), interjection",
-      "Astuce : « tout » peut être déterminant, pronom ou adverbe selon la phrase",
-    ],
-  },
-  {
-    title: "Fonctions dans la phrase",
-    items: [
-      "Sujet : qui est-ce qui / qu'est-ce qui + verbe ?",
-      "COD : sujet + verbe + qui ? / quoi ? (sans préposition)",
-      "COI : sujet + verbe + à qui ? de quoi ? (avec préposition)",
-      "Attribut du sujet : après un verbe d'état (être, paraître, sembler, devenir, demeurer, rester, avoir l'air)",
-      "CC de temps, lieu, manière, cause, but… : déplaçable et supprimable",
-      "Complément du nom : nom + préposition + nom (le cahier de l'élève)",
-      "Épithète (collée au nom) / apposition (détachée par une virgule)",
-    ],
-  },
-  {
-    title: "Les propositions",
-    items: [
-      "Indépendante : se suffit à elle-même",
-      "Juxtaposées (virgule, point-virgule) / coordonnées (et, mais, car…)",
-      "Principale + subordonnée",
-      "Relative : introduite par qui, que, dont, où, lequel… ; complète un antécédent",
-      "Complétive : introduite par « que », COD du verbe (Je pense que…)",
-      "Circonstancielle : temps (quand), cause (parce que), but (pour que + subj.), conséquence (si bien que), concession (bien que + subj.), condition (si)",
-    ],
-  },
-  {
-    title: "Accord du participe passé",
-    items: [
-      "Avec être : accord avec le sujet (Elles sont parties)",
-      "Avec avoir : accord avec le COD seulement s'il est placé AVANT (Les lettres que j'ai écrites)",
-      "Sans auxiliaire : comme un adjectif (Une porte fermée)",
-      "Verbes pronominaux : le plus souvent comme avec être (Elles se sont levées) — sauf si le COD est après (Elles se sont lavé les mains)",
-    ],
-  },
-  {
-    title: "Temps et modes à maîtriser",
-    items: [
-      "Passé simple : il chanta, il finit, il prit, il vint, il fut, il eut",
-      "Imparfait (description, habitude) vs passé simple (action ponctuelle)",
-      "Subjonctif après : il faut que, bien que, pour que, avant que, vouloir que",
-      "Conditionnel : si + imparfait → conditionnel présent (Si j'étais maître, j'enseignerais…)",
-      "Futur / conditionnel : je chanterai (futur) ≠ je chanterais (conditionnel)",
-    ],
-  },
-  {
-    title: "Homophones fréquents",
-    items: [
-      "a (avoir → avait) / à (préposition)",
-      "et (et puis) / est (était)",
-      "son (le sien) / sont (étaient)",
-      "ces (ceux-là) / ses (les siens) / c'est (cela est) / s'est (pronominal)",
-      "leur (devant un verbe, invariable) / leurs (devant un nom pluriel)",
-      "quel(le)(s) (déterminant) / qu'elle(s) (que + elle)",
-      "ou (ou bien) / où (lieu, temps)",
-      "peu (pas beaucoup) / peut (pouvait) / peux",
-      "-é (participe, remplaçable par « vendu ») / -er (infinitif, « vendre »)",
-    ],
-  },
-];
-
-export const tsqTexts: TsqText[] = [
+const baseTexts: TsqText[] = [
   {
     id: "maitre-village",
     title: "Le maître du village",
@@ -211,7 +123,7 @@ Encore faut-il la transmettre. Si les enfants ne voient plus leurs parents parta
 
 export type Drill = { cat: string; q: string; options: string[]; correct: number; explain: string };
 
-export const drills: Drill[] = [
+const baseDrills: Drill[] = [
   { cat: "Homophones", q: "Il … reçu un livre … la bibliothèque.", options: ["a / à", "à / a", "a / a", "à / à"], correct: 0, explain: "« a » = avait (verbe avoir) ; « à » = préposition." },
   { cat: "Homophones", q: "Le maître … ses élèves … partis en excursion.", options: ["et / sont", "est / son", "et / son", "est / sont"], correct: 0, explain: "« et » = et puis ; « sont » = étaient." },
   { cat: "Homophones", q: "Je … donne … cahiers.", options: ["leurs / leur", "leur / leurs", "leur / leur", "leurs / leurs"], correct: 1, explain: "Devant un verbe, « leur » est un pronom invariable ; devant un nom pluriel, « leurs » est un déterminant." },
@@ -248,3 +160,6 @@ export const drills: Drill[] = [
   { cat: "Vocabulaire", q: "« Il a les yeux plus gros que le ventre » est :", options: ["une comparaison", "une expression figurée", "une litote", "un euphémisme"], correct: 1, explain: "Expression figurée (idiomatique) : vouloir plus qu'on ne peut consommer ou faire." },
   { cat: "Vocabulaire", q: "« Cette école est une ruche » : figure de style ?", options: ["comparaison", "métaphore", "personnification", "hyperbole"], correct: 1, explain: "Rapprochement sans outil de comparaison : métaphore (une comparaison utiliserait « comme »)." },
 ];
+
+export const tsqTexts: TsqText[] = [...baseTexts, ...moreTexts];
+export const drills: Drill[] = [...baseDrills, ...moreDrills];
