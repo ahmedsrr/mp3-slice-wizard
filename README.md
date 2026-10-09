@@ -2,9 +2,9 @@
 
 Application de révision pour le Concours de recrutement d'élèves-maîtres (CREM, Sénégal) :
 
-- **Mathématiques** : 11 fiches de cours (décimaux, fractions, pourcentages, proportionnalité, vitesse, mesures, géométrie, volumes, partages, commerce et intérêts, échelles) et exercices générés à l'infini, corrigés avec les étapes.
-- **Texte suivi de questions (TSQ)** : textes inédits avec questions de compréhension, vocabulaire, grammaire, conjugaison, orthographe et production, corrigés ; QCM de langue ; fiches de grammaire ; méthode.
-- **Dissertation** : méthode, gestion des 3 h, banque de sujets avec problématique et plan, atelier de rédaction chronométré avec grille d'auto-évaluation, connecteurs et citations.
+- **Mathématiques** : 14 thèmes d'exercices générés à l'infini (dont durées et horaires, intervalles, âges) et des problèmes complets à plusieurs questions, tous corrigés étape par étape.
+- **Texte suivi de questions (TSQ)** : 8 textes inédits avec questions corrigées, 68 QCM de langue et un exercice « repère les mots fautifs » dans le style de la présélection.
+- **Dissertation** : 30 sujets avec problématique et plan, rédaction chronométrée (introduction 20 min, plan détaillé 45 min, copie complète 3 h), exercices « remets l'introduction dans l'ordre » et « quel type de plan ? ».
 - **Examen blanc** chronométré pour chaque épreuve.
 
 La progression est enregistrée dans le navigateur (localStorage).

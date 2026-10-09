@@ -12,7 +12,7 @@ import { ExamenBlanc } from "./components/crem/ExamenBlanc";
 
 const Page = ({ title, children }: { title: string; children: ReactNode }) => (
   <>
-    <h1 className="mb-6 text-3xl font-bold font-serif">{title}</h1>
+    <h1 className="mb-4 text-2xl sm:mb-6 sm:text-3xl font-bold font-serif">{title}</h1>
     {children}
   </>
 );

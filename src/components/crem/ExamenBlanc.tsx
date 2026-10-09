@@ -25,19 +25,19 @@ function MathsExam({ onQuit }: { onQuit: () => void }) {
 
   return (
     <div className="space-y-4">
-      <div className="sticky top-16 z-10 flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-background/95 p-3 backdrop-blur">
+      <div className="sticky top-14 z-10 -mx-4 flex items-center justify-between gap-2 border-b bg-background/95 px-4 py-2 backdrop-blur sm:mx-0 sm:rounded-lg sm:border">
         <Timer minutes={60} />
-        <span className="font-medium">
-          {answered}/{N} répondus{answered === N && ` · Note : ${Math.round((ok / N) * 20 * 10) / 10}/20`}
+        <span className="text-sm font-medium sm:text-base">
+          {answered}/{N}{answered === N && ` · ${Math.round((ok / N) * 20 * 10) / 10}/20`}
         </span>
-        <Button variant="ghost" onClick={onQuit}>
+        <Button variant="ghost" size="sm" onClick={onQuit}>
           Quitter
         </Button>
       </div>
       {exos.map((e, i) => (
         <ExerciseCard
           key={i}
-          topicId={e.topic.id}
+          label={`${i + 1}. ${e.topic.title}`}
           ex={e.ex}
           onAnswered={(r) => {
             setResults((s) => ({ ...s, [i]: r }));
@@ -75,7 +75,7 @@ export function ExamenBlanc() {
   const cards = [
     { id: "diss" as const, icon: PenLine, title: "Dissertation", time: "3 h", desc: "Un sujet tiré au hasard, chrono de 3 heures, éditeur avec sauvegarde et grille d'auto-évaluation." },
     { id: "tsq" as const, icon: FileText, title: "Texte suivi de questions", time: "1 h", desc: "Un texte inédit : compréhension, vocabulaire, grammaire, conjugaison et production écrite, avec corrigé." },
-    { id: "maths" as const, icon: Calculator, title: "Mathématiques", time: "1 h", desc: `${N} problèmes de thèmes différents, corrigés automatiquement, note sur 20.` },
+    { id: "maths" as const, icon: Calculator, title: "Mathématiques", time: "1 h", desc: `${N} exercices de thèmes différents, corrigés automatiquement, note sur 20.` },
   ];
 
   return (
@@ -83,7 +83,7 @@ export function ExamenBlanc() {
       <p className="text-muted-foreground max-w-2xl">
         Mets-toi en conditions réelles : téléphone éteint, brouillon à côté, et ne regarde pas les corrigés avant la fin du chrono.
       </p>
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {cards.map((c) => (
           <Card key={c.id} className="flex flex-col">
             <CardHeader>

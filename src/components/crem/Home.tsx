@@ -12,13 +12,13 @@ const sum = (r: Record<string, { ok: number; total: number }>) =>
   Object.values(r).reduce((a, s) => ({ ok: a.ok + s.ok, total: a.total + s.total }), { ok: 0, total: 0 });
 
 const semaine = [
-  { jour: "Lundi", tache: "Maths : 1 fiche + 15 exercices" },
+  { jour: "Lundi", tache: "Maths : 20 exercices par thème + 1 problème complet" },
   { jour: "Mardi", tache: "TSQ : 1 texte complet chronométré" },
-  { jour: "Mercredi", tache: "Dissertation : analyse de 3 sujets + plans détaillés" },
-  { jour: "Jeudi", tache: "Maths : entraînement mélangé (30 min) + langue (20 questions)" },
-  { jour: "Vendredi", tache: "Dissertation : rédaction complète en 3 h" },
+  { jour: "Mercredi", tache: "Dissertation : 2 plans détaillés + 3 « type de plan »" },
+  { jour: "Jeudi", tache: "TSQ : 20 QCM de langue + 10 phrases à corriger" },
+  { jour: "Vendredi", tache: "Dissertation : copie complète en 3 h" },
   { jour: "Samedi", tache: "Examen blanc maths ou TSQ" },
-  { jour: "Dimanche", tache: "Repos + relecture des fiches et des citations" },
+  { jour: "Dimanche", tache: "Repos, ou 2 introductions de 20 min" },
 ];
 
 export function Home() {
@@ -35,44 +35,44 @@ export function Home() {
 
   return (
     <div className="space-y-8">
-      <section className="rounded-2xl bg-gradient-to-br from-primary to-primary/70 p-6 sm:p-10 text-primary-foreground">
+      <section className="rounded-2xl bg-gradient-to-br from-primary to-primary/70 p-5 sm:p-10 text-primary-foreground">
         <p className="text-sm uppercase tracking-widest opacity-80">Concours de recrutement d'élèves-maîtres</p>
-        <h1 className="mt-2 text-3xl sm:text-5xl font-bold font-serif">Réussir le CREM 2026</h1>
+        <h1 className="mt-2 text-3xl sm:text-5xl font-bold font-serif leading-tight">Réussir le CREM 2026</h1>
         <p className="mt-3 max-w-2xl opacity-90">
-          Fiches, exercices illimités et épreuves blanches pour les mathématiques, le texte suivi de questions et la dissertation.
+          Exercices illimités, textes corrigés, sujets et épreuves blanches pour les mathématiques, le texte suivi de questions et la dissertation.
         </p>
         <div className="mt-6 flex flex-wrap items-center gap-3">
-          <Button asChild variant="secondary">
+          <Button asChild variant="secondary" className="w-full sm:w-auto">
             <Link to="/examen">Lancer un examen blanc</Link>
           </Button>
-          <div className="flex items-center gap-2 rounded-lg bg-primary-foreground/15 px-3 py-1.5">
+          <div className="flex w-full flex-wrap items-center gap-2 rounded-lg bg-primary-foreground/15 px-3 py-2 sm:w-auto">
             <CalendarClock className="h-4 w-4" />
-            <label htmlFor="exam-date" className="text-sm">Date de mon épreuve :</label>
+            <label htmlFor="exam-date" className="text-sm whitespace-nowrap">Date de mon épreuve</label>
             <Input
               id="exam-date"
               type="date"
               value={progress.examDate ?? ""}
               onChange={(e) => update((p) => ({ ...p, examDate: e.target.value || undefined }))}
-              className="h-8 w-40 border-0 bg-primary-foreground text-foreground"
+              className="h-9 w-full border-0 bg-primary-foreground text-foreground sm:h-8 sm:w-40"
             />
             {days !== null && days >= 0 && <span className="text-sm font-semibold">J-{days}</span>}
           </div>
         </div>
       </section>
 
-      <section className="grid gap-4 sm:grid-cols-3">
+      <section className="grid grid-cols-3 gap-2 sm:gap-4">
         {stats.map((s) => (
           <Link key={s.label} to={s.to}>
             <Card className="h-full transition-shadow hover:shadow-md">
-              <CardHeader className="pb-2">
-                <CardDescription className="flex items-center gap-2">
-                  <s.icon className="h-4 w-4" /> {s.label}
+              <CardHeader className="p-3 pb-2 sm:p-6 sm:pb-2">
+                <CardDescription className="flex items-center gap-1.5 text-xs sm:text-sm">
+                  <s.icon className="h-4 w-4 shrink-0" /> <span className="truncate">{s.label}</span>
                 </CardDescription>
-                <CardTitle className="text-3xl tabular-nums">{s.value}</CardTitle>
+                <CardTitle className="text-xl sm:text-3xl tabular-nums">{s.value}</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2">
+              <CardContent className="space-y-2 p-3 pt-0 sm:p-6 sm:pt-0">
                 <Bar value={s.pct} />
-                <p className="text-xs text-muted-foreground">{s.sub}</p>
+                <p className="hidden text-xs text-muted-foreground sm:block">{s.sub}</p>
               </CardContent>
             </Card>
           </Link>

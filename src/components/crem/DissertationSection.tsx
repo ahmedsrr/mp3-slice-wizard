@@ -1,42 +1,50 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Eye, PenLine, Quote, Shuffle } from "lucide-react";
-import { citations, connecteurs, grille, methodSteps, subjects, timePlan, type Subject } from "@/data/dissertation";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ArrowDown, ArrowUp, CheckCircle2, ChevronDown, Eye, PenLine, Shuffle, XCircle } from "lucide-react";
+import { citations, connecteurs, grille, subjects, type Subject } from "@/data/dissertation";
+import { introRoles, intros } from "@/data/dissertationExtra";
 import { useLocalText, useProgress } from "@/lib/progress";
 import { Timer } from "./Timer";
 import { toast } from "sonner";
+
+const shuffle = <T,>(arr: T[]) => [...arr].sort(() => Math.random() - 0.5);
+const randomSubject = () => subjects[Math.floor(Math.random() * subjects.length)];
 
 function SubjectDetail({ s, onWrite }: { s: Subject; onWrite: () => void }) {
   const [showPlan, setShowPlan] = useState(false);
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="p-4 sm:p-6">
         <div className="flex flex-wrap gap-2">
           <Badge>{s.type}</Badge>
           <Badge variant="outline">{s.theme}</Badge>
         </div>
-        <CardTitle className="font-serif text-xl leading-snug pt-2">{s.sujet}</CardTitle>
+        <CardTitle className="font-serif text-lg sm:text-xl leading-snug pt-2">{s.sujet}</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div>
-          <h4 className="font-semibold mb-1">Mots clés</h4>
-          <ul className="list-disc list-inside text-sm space-y-1">
-            {s.motsCles.map((m) => (
-              <li key={m}>{m}</li>
-            ))}
-          </ul>
-        </div>
-        <div className="rounded-lg bg-primary/10 p-3">
-          <span className="font-semibold">Problématique possible : </span>
-          {s.problematique}
-        </div>
-        {showPlan ? (
-          <div className="space-y-3">
+      <CardContent className="space-y-4 p-4 pt-0 sm:p-6 sm:pt-0">
+        <p className="text-sm text-muted-foreground">
+          Au brouillon (10 min) : définis les mots clés, formule une problématique et construis ton plan. Ensuite seulement, compare avec la proposition.
+        </p>
+        {showPlan && (
+          <div className="space-y-4">
+            <div>
+              <h4 className="font-semibold mb-1">Mots clés</h4>
+              <ul className="list-disc list-inside text-sm space-y-1">
+                {s.motsCles.map((m) => (
+                  <li key={m}>{m}</li>
+                ))}
+              </ul>
+            </div>
+            <div className="rounded-lg bg-primary/10 p-3 text-sm">
+              <span className="font-semibold">Problématique possible : </span>
+              {s.problematique}
+            </div>
             {s.plan.map((p) => (
               <div key={p.titre}>
                 <h5 className="font-semibold">{p.titre}</h5>
@@ -48,12 +56,10 @@ function SubjectDetail({ s, onWrite }: { s: Subject; onWrite: () => void }) {
               </div>
             ))}
           </div>
-        ) : (
-          <p className="text-sm text-muted-foreground">Essaie d'abord de construire ton propre plan au brouillon (10 min), puis compare.</p>
         )}
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-col gap-2 sm:flex-row">
           <Button variant="outline" onClick={() => setShowPlan((v) => !v)}>
-            <Eye className="h-4 w-4 mr-1" /> {showPlan ? "Masquer" : "Voir"} le plan proposé
+            <Eye className="h-4 w-4 mr-1" /> {showPlan ? "Masquer" : "Voir"} la proposition
           </Button>
           <Button onClick={onWrite}>
             <PenLine className="h-4 w-4 mr-1" /> Rédiger ce sujet
@@ -64,64 +70,111 @@ function SubjectDetail({ s, onWrite }: { s: Subject; onWrite: () => void }) {
   );
 }
 
-export function Atelier({ subject, minutes = 180 }: { subject: Subject; minutes?: number }) {
-  const [text, setText] = useLocalText(`crem-diss-${subject.id}`);
+const modes = [
+  { id: "intro", label: "Introduction", minutes: 20, hint: "Amorce, sujet posé, problématique, annonce du plan (8 à 12 lignes)." },
+  { id: "plan", label: "Plan détaillé", minutes: 45, hint: "Problématique + parties, sous-parties, arguments et exemples en style télégraphique." },
+  { id: "copie", label: "Copie complète", minutes: 180, hint: "Introduction, développement, conclusion." },
+] as const;
+
+function Boite() {
+  return (
+    <Collapsible>
+      <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg border bg-card px-4 py-3 text-sm font-medium">
+        Boîte à outils : connecteurs et citations <ChevronDown className="h-4 w-4" />
+      </CollapsibleTrigger>
+      <CollapsibleContent className="space-y-4 pt-3">
+        {connecteurs.map((c) => (
+          <div key={c.role}>
+            <p className="text-xs font-semibold uppercase text-muted-foreground mb-1">{c.role}</p>
+            <div className="flex flex-wrap gap-1.5">
+              {c.words.map((w) => (
+                <Badge key={w} variant="secondary" className="font-normal">
+                  {w}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        ))}
+        <div className="space-y-2">
+          {citations.map((c) => (
+            <blockquote key={c.text} className="border-l-4 border-primary pl-3 text-sm">
+              <p className="font-serif italic">« {c.text} »</p>
+              <footer className="text-xs text-muted-foreground">— {c.author}</footer>
+            </blockquote>
+          ))}
+        </div>
+      </CollapsibleContent>
+    </Collapsible>
+  );
+}
+
+export function Atelier({ subject, initialMode = "copie" }: { subject: Subject; initialMode?: (typeof modes)[number]["id"] }) {
+  const [modeId, setModeId] = useState<(typeof modes)[number]["id"]>(initialMode);
+  const mode = modes.find((m) => m.id === modeId)!;
+  const [text, setText] = useLocalText(`crem-diss-${subject.id}${modeId === "copie" ? "" : `-${modeId}`}`);
   const [checked, setChecked] = useState<boolean[]>(() => grille.map(() => false));
   const { update } = useProgress();
   const words = text.trim() ? text.trim().split(/\s+/).length : 0;
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
-      <Card>
-        <CardHeader>
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <CardDescription>Sujet</CardDescription>
-            <Timer minutes={minutes} onEnd={() => toast("Temps écoulé ! Pose ton stylo et relis-toi.")} />
-          </div>
-          <CardTitle className="font-serif text-lg leading-snug">{subject.sujet}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <Textarea
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder={"Introduction : amorce, sujet posé, problématique, annonce du plan…\n\nDéveloppement…\n\nConclusion…"}
-            className="min-h-[420px] font-serif text-[1.05rem] leading-7"
-          />
-          <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-muted-foreground">
-            <span>
-              {words} mots · une bonne copie fait souvent entre 900 et 1 500 mots
-            </span>
-            <Button
-              size="sm"
-              onClick={() => {
-                update((p) => ({
-                  ...p,
-                  dissertations: [
-                    ...p.dissertations.filter((d) => d.id !== subject.id),
-                    { id: subject.id, subject: subject.sujet, words, date: new Date().toISOString() },
-                  ],
-                }));
-                toast.success("Copie enregistrée dans ta progression");
-              }}
-              disabled={words < 50}
-            >
-              Enregistrer ma copie
+    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
+      <div className="min-w-0 space-y-4">
+        <div className="grid grid-cols-3 gap-2">
+          {modes.map((m) => (
+            <Button key={m.id} size="sm" variant={m.id === modeId ? "default" : "outline"} onClick={() => setModeId(m.id)} className="h-auto whitespace-normal py-2">
+              {m.label}
+              <span className="ml-1 hidden opacity-70 sm:inline">· {m.minutes >= 60 ? `${m.minutes / 60} h` : `${m.minutes} min`}</span>
             </Button>
-          </div>
-        </CardContent>
-      </Card>
+          ))}
+        </div>
+        <Card>
+          <CardHeader className="p-4 sm:p-6">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <CardDescription>{mode.hint}</CardDescription>
+              <Timer key={modeId} minutes={mode.minutes} onEnd={() => toast("Temps écoulé ! Pose ton stylo et relis-toi.")} />
+            </div>
+            <CardTitle className="font-serif text-base sm:text-lg leading-snug">{subject.sujet}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 p-4 pt-0 sm:p-6 sm:pt-0">
+            <Textarea
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              placeholder={mode.id === "plan" ? "Problématique :\nI. …\n  1) …\n  2) …\nII. …" : "Commence ici…"}
+              className="min-h-[300px] sm:min-h-[420px] font-serif text-base sm:text-[1.05rem] leading-7"
+            />
+            <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-muted-foreground">
+              <span>{words} mots</span>
+              {mode.id === "copie" && (
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    update((p) => ({
+                      ...p,
+                      dissertations: [
+                        ...p.dissertations.filter((d) => d.id !== subject.id),
+                        { id: subject.id, subject: subject.sujet, words, date: new Date().toISOString() },
+                      ],
+                    }));
+                    toast.success("Copie enregistrée dans ta progression");
+                  }}
+                  disabled={words < 50}
+                >
+                  Enregistrer ma copie
+                </Button>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+        <Boite />
+      </div>
       <Card className="lg:self-start">
-        <CardHeader className="pb-2">
+        <CardHeader className="p-4 pb-2 sm:p-6 sm:pb-2">
           <CardTitle className="text-base">Grille d'auto-évaluation</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-3 p-4 sm:p-6">
           {grille.map((g, i) => (
             <label key={g} className="flex items-start gap-2 text-sm cursor-pointer">
-              <Checkbox
-                checked={checked[i]}
-                onCheckedChange={(v) => setChecked((c) => c.map((x, j) => (j === i ? v === true : x)))}
-                className="mt-0.5"
-              />
+              <Checkbox checked={checked[i]} onCheckedChange={(v) => setChecked((c) => c.map((x, j) => (j === i ? v === true : x)))} className="mt-0.5" />
               <span>{g}</span>
             </label>
           ))}
@@ -131,6 +184,141 @@ export function Atelier({ subject, minutes = 180 }: { subject: Subject; minutes?
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+function OrdreIntro() {
+  const [order, setOrder] = useState(() => shuffle(intros));
+  const [idx, setIdx] = useState(0);
+  const intro = order[idx % order.length];
+  const subject = subjects.find((s) => s.id === intro.subjectId)!;
+  const [items, setItems] = useState(() => shuffle([0, 1, 2, 3]));
+  const [checked, setChecked] = useState(false);
+  const { record } = useProgress();
+  const ok = items.every((v, i) => v === i);
+
+  const move = (i: number, d: -1 | 1) => {
+    const j = i + d;
+    if (checked || j < 0 || j >= items.length) return;
+    setItems((cur) => {
+      const n = [...cur];
+      [n[i], n[j]] = [n[j], n[i]];
+      return n;
+    });
+  };
+
+  return (
+    <Card>
+      <CardHeader className="p-4 sm:p-6">
+        <CardTitle className="text-lg">Remets l'introduction dans l'ordre</CardTitle>
+        <CardDescription className="font-serif text-base text-foreground">{subject.sujet}</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-3 p-4 pt-0 sm:p-6 sm:pt-0">
+        {items.map((v, i) => (
+          <div
+            key={v}
+            className={`flex items-start gap-2 rounded-lg border p-3 ${checked ? (v === i ? "border-success bg-success/10" : "border-destructive bg-destructive/10") : "bg-card"}`}
+          >
+            <div className="flex shrink-0 flex-col">
+              <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => move(i, -1)} disabled={checked || i === 0} aria-label="Monter">
+                <ArrowUp className="h-4 w-4" />
+              </Button>
+              <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => move(i, 1)} disabled={checked || i === items.length - 1} aria-label="Descendre">
+                <ArrowDown className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="min-w-0 text-sm sm:text-base">
+              {checked && <p className="text-xs font-semibold uppercase text-muted-foreground">{introRoles[v]}</p>}
+              <p className="font-serif">{intro.parts[v]}</p>
+            </div>
+          </div>
+        ))}
+        {!checked ? (
+          <Button className="w-full sm:w-auto" onClick={() => { setChecked(true); record("langue", "Introductions", ok); }}>
+            Vérifier
+          </Button>
+        ) : (
+          <div className="space-y-3">
+            <p className={`flex items-center gap-2 font-medium ${ok ? "text-success" : "text-destructive"}`}>
+              {ok ? <CheckCircle2 className="h-5 w-5" /> : <XCircle className="h-5 w-5" />}
+              {ok ? "Ordre correct !" : "Ordre attendu : amorce → sujet posé → problématique → annonce du plan."}
+            </p>
+            <Button
+              className="w-full sm:w-auto"
+              onClick={() => {
+                if ((idx + 1) % order.length === 0) setOrder(shuffle(intros));
+                setIdx((x) => x + 1);
+                setItems(shuffle([0, 1, 2, 3]));
+                setChecked(false);
+              }}
+            >
+              Introduction suivante
+            </Button>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+const planTypes: Subject["type"][] = ["Dialectique", "Analytique", "Thématique"];
+const planExplain: Record<Subject["type"], string> = {
+  Dialectique: "Le sujet appelle un débat (« Discutez », « Partagez-vous… ? », question fermée) : thèse, antithèse, synthèse.",
+  Analytique: "Le sujet porte sur un problème (phénomène, fléau) : constat ou causes, conséquences, solutions.",
+  Thématique: "Le sujet demande d'expliquer ou d'énumérer des rôles, des aspects : une partie par aspect.",
+};
+
+function QuelPlan() {
+  const order = useMemo(() => shuffle(subjects), []);
+  const [idx, setIdx] = useState(0);
+  const [chosen, setChosen] = useState<Subject["type"] | null>(null);
+  const { progress, record } = useProgress();
+  const s = order[idx % order.length];
+  const score = progress.langue["Type de plan"];
+
+  return (
+    <Card>
+      <CardHeader className="p-4 sm:p-6">
+        <div className="flex items-center justify-between gap-2">
+          <CardTitle className="text-lg">Quel type de plan ?</CardTitle>
+          {score && <span className="text-sm text-muted-foreground">{score.ok}/{score.total}</span>}
+        </div>
+        <CardDescription className="font-serif text-base text-foreground">{s.sujet}</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-3 p-4 pt-0 sm:p-6 sm:pt-0">
+        <div className="grid gap-2 sm:grid-cols-3">
+          {planTypes.map((t) => {
+            const state = chosen === null ? "" : t === s.type ? "border-success bg-success/10" : t === chosen ? "border-destructive bg-destructive/10" : "opacity-60";
+            return (
+              <button
+                key={t}
+                className={`rounded-lg border px-4 py-3 text-left transition-colors hover:bg-muted ${state}`}
+                onClick={() => {
+                  if (chosen) return;
+                  setChosen(t);
+                  record("langue", "Type de plan", t === s.type);
+                }}
+              >
+                {t}
+              </button>
+            );
+          })}
+        </div>
+        {chosen && (
+          <div className="space-y-3">
+            <p className="rounded-md bg-muted p-3 text-sm">
+              <strong>{s.type}.</strong> {planExplain[s.type]}
+              <br />
+              <span className="text-muted-foreground">Plan proposé : {s.plan.map((p) => p.titre).join(" · ")}</span>
+            </p>
+            <p className="text-xs text-muted-foreground">Certains sujets acceptent plusieurs plans : l'essentiel est de répondre à la problématique.</p>
+            <Button className="w-full sm:w-auto" onClick={() => { setIdx((i) => i + 1); setChosen(null); }}>
+              Sujet suivant
+            </Button>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 
@@ -145,30 +333,44 @@ export function DissertationSection() {
 
   return (
     <Tabs value={tab} onValueChange={setTab} className="space-y-6">
-      <TabsList className="flex-wrap h-auto">
-        <TabsTrigger value="sujets">Banque de sujets</TabsTrigger>
-        <TabsTrigger value="atelier">Atelier de rédaction</TabsTrigger>
-        <TabsTrigger value="methode">Méthode</TabsTrigger>
-        <TabsTrigger value="outils">Connecteurs & citations</TabsTrigger>
+      <TabsList className="grid h-auto w-full grid-cols-2 sm:inline-flex sm:w-auto">
+        <TabsTrigger value="sujets" className="whitespace-normal">Sujets ({subjects.length})</TabsTrigger>
+        <TabsTrigger value="atelier" className="whitespace-normal">Rédiger</TabsTrigger>
+        <TabsTrigger value="intro" className="whitespace-normal">Ordre de l'intro</TabsTrigger>
+        <TabsTrigger value="plan" className="whitespace-normal">Type de plan</TabsTrigger>
       </TabsList>
 
       <TabsContent value="sujets" className="space-y-4">
-        <div className="flex flex-wrap gap-2">
-          {themes.map((t) => (
-            <Button key={t} size="sm" variant={t === theme ? "default" : "outline"} onClick={() => setTheme(t)}>
-              {t}
-            </Button>
-          ))}
-          <Button
-            size="sm"
-            variant="secondary"
-            onClick={() => setSubjectId(subjects[Math.floor(Math.random() * subjects.length)].id)}
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <select
+            value={theme}
+            onChange={(e) => setTheme(e.target.value)}
+            className="rounded-md border bg-card px-3 py-2 text-sm sm:w-64"
+            aria-label="Thème"
           >
+            {themes.map((t) => (
+              <option key={t}>{t}</option>
+            ))}
+          </select>
+          <Button variant="secondary" onClick={() => setSubjectId(randomSubject().id)}>
             <Shuffle className="h-4 w-4 mr-1" /> Sujet au hasard
           </Button>
         </div>
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,340px)_1fr]">
-          <div className="space-y-2">
+        <select
+          value={subjectId}
+          onChange={(e) => setSubjectId(e.target.value)}
+          className="w-full rounded-md border bg-card px-3 py-2.5 text-sm lg:hidden"
+          aria-label="Sujet"
+        >
+          {list.map((s) => (
+            <option key={s.id} value={s.id}>
+              {progress.dissertations.some((d) => d.id === s.id) ? "✓ " : ""}
+              {s.sujet.length > 90 ? `${s.sujet.slice(0, 90)}…` : s.sujet}
+            </option>
+          ))}
+        </select>
+        <div className="grid gap-6 lg:grid-cols-[340px_minmax(0,1fr)]">
+          <div className="hidden max-h-[70vh] space-y-2 overflow-auto pr-1 lg:block">
             {list.map((s) => {
               const done = progress.dissertations.some((d) => d.id === s.id);
               return (
@@ -187,10 +389,14 @@ export function DissertationSection() {
               );
             })}
           </div>
-          <SubjectDetail key={subject.id} s={subject} onWrite={() => {
-            setTab("atelier");
-            window.scrollTo({ top: 0 });
-          }} />
+          <SubjectDetail
+            key={subject.id}
+            s={subject}
+            onWrite={() => {
+              setTab("atelier");
+              window.scrollTo({ top: 0 });
+            }}
+          />
         </div>
       </TabsContent>
 
@@ -198,85 +404,12 @@ export function DissertationSection() {
         <Atelier key={subject.id} subject={subject} />
       </TabsContent>
 
-      <TabsContent value="methode" className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Gestion des 3 heures</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex h-8 w-full overflow-hidden rounded-md">
-              {timePlan.map((t, i) => (
-                <div
-                  key={t.label}
-                  style={{ width: `${(t.min / 180) * 100}%` }}
-                  className={`flex items-center justify-center text-xs font-medium text-primary-foreground ${
-                    ["bg-primary", "bg-primary/80", "bg-primary/60", "bg-accent", "bg-primary/90"][i]
-                  }`}
-                >
-                  {t.min}′
-                </div>
-              ))}
-            </div>
-            <ul className="mt-3 grid gap-1 text-sm sm:grid-cols-2">
-              {timePlan.map((t) => (
-                <li key={t.label}>
-                  <span className="font-medium">{t.min} min</span> — {t.label}
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-        <div className="grid gap-4 md:grid-cols-2">
-          {methodSteps.map((m) => (
-            <Card key={m.title}>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg">{m.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="list-disc list-inside space-y-1 text-sm leading-relaxed">
-                  {m.points.map((p) => (
-                    <li key={p}>{p}</li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+      <TabsContent value="intro">
+        <OrdreIntro />
       </TabsContent>
 
-      <TabsContent value="outils" className="space-y-6">
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {connecteurs.map((c) => (
-            <Card key={c.role}>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base">{c.role}</CardTitle>
-              </CardHeader>
-              <CardContent className="flex flex-wrap gap-2">
-                {c.words.map((w) => (
-                  <Badge key={w} variant="secondary" className="font-normal">
-                    {w}
-                  </Badge>
-                ))}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Quote className="h-5 w-5" /> Citations utiles sur l'éducation
-            </CardTitle>
-            <CardDescription>À utiliser en amorce ou comme argument d'autorité — cite exactement et nomme l'auteur.</CardDescription>
-          </CardHeader>
-          <CardContent className="grid gap-3 md:grid-cols-2">
-            {citations.map((c) => (
-              <blockquote key={c.text} className="border-l-4 border-primary pl-3">
-                <p className="font-serif italic">« {c.text} »</p>
-                <footer className="text-sm text-muted-foreground">— {c.author}</footer>
-              </blockquote>
-            ))}
-          </CardContent>
-        </Card>
+      <TabsContent value="plan">
+        <QuelPlan />
       </TabsContent>
     </Tabs>
   );
