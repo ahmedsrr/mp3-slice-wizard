@@ -1,73 +1,21 @@
-# Welcome to your Lovable project
+# Révisions CREM 2026
 
-## Project info
+Application de révision pour le Concours de recrutement d'élèves-maîtres (CREM, Sénégal) :
 
-**URL**: https://lovable.dev/projects/2f38530d-f70e-478a-a97e-632463fc47cd
+- **Mathématiques** : 11 fiches de cours (décimaux, fractions, pourcentages, proportionnalité, vitesse, mesures, géométrie, volumes, partages, commerce et intérêts, échelles) et exercices générés à l'infini, corrigés avec les étapes.
+- **Texte suivi de questions (TSQ)** : textes inédits avec questions de compréhension, vocabulaire, grammaire, conjugaison, orthographe et production, corrigés ; QCM de langue ; fiches de grammaire ; méthode.
+- **Dissertation** : méthode, gestion des 3 h, banque de sujets avec problématique et plan, atelier de rédaction chronométré avec grille d'auto-évaluation, connecteurs et citations.
+- **Examen blanc** chronométré pour chaque épreuve.
 
-## How can I edit this code?
+La progression est enregistrée dans le navigateur (localStorage).
 
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/2f38530d-f70e-478a-a97e-632463fc47cd) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+## Développement
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Déploiement sur Vercel
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/2f38530d-f70e-478a-a97e-632463fc47cd) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Importer le dépôt dans Vercel (preset **Vite**, build `npm run build`, sortie `dist`). Le fichier `vercel.json` redirige toutes les routes vers `index.html` pour que les URL comme `/maths` fonctionnent.
