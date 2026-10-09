@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { useAutoUpdate } from "@/lib/autoUpdate";
 import { BookOpenCheck, Calculator, FileText, Home as HomeIcon, PenLine, Timer } from "lucide-react";
 
 const nav = [
@@ -13,6 +14,7 @@ const nav = [
 const Layout = () => {
   const { pathname } = useLocation();
   useEffect(() => window.scrollTo({ top: 0 }), [pathname]);
+  useAutoUpdate();
 
   return (
     <div className="min-h-screen bg-background">
@@ -43,7 +45,10 @@ const Layout = () => {
       </header>
 
       <main className="mx-auto max-w-7xl px-4 pb-28 pt-6 sm:pt-8 md:pb-10">
-        <Outlet />
+        {/* Une clé par page : chaque page repart d'un état neuf quand on y revient */}
+        <div key={pathname}>
+          <Outlet />
+        </div>
       </main>
 
       <footer className="hidden border-t py-6 text-center text-xs text-muted-foreground md:block">
